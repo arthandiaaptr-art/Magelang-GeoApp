@@ -1,6 +1,8 @@
 # ==========================================
-# LANGKAH 34.4 - MAGELANG GEOAPP
+# MAGELANG GEOAPP
 # DASHBOARD SHINY LEAFLET
+# Daffina Putri Affandi 5016241101
+# Arthandia Pratma T.R 5016241105
 # ==========================================
 
 # 1. MEMANGGIL PACKAGE
@@ -10,10 +12,7 @@ library(leaflet)
 library(sf)
 library(terra)
 
-# ==========================================
 # 2. MEMBACA SHAPEFILE
-# ==========================================
-
 magelang <- sf::st_read(
   "HASIL/Kecamatan_Statistik_Magelang.shp",
   quiet = TRUE
@@ -26,10 +25,7 @@ magelang$id_peta <- as.character(
   seq_len(nrow(magelang))
 )
 
-# ==========================================
 # 3. MEMBACA RASTER
-# ==========================================
-
 NDVI_leaflet <- terra::rast(
   "HASIL/NDVI_Magelang.tif"
 )
@@ -64,10 +60,7 @@ daftar_raster <- list(
   NDCI = siapkan_raster(NDCI_leaflet)
 )
 
-# ==========================================
 # 4. PALET WARNA INDEKS
-# ==========================================
-
 warna_indeks <- list(
   
   # Vegetasi
@@ -109,10 +102,7 @@ warna_indeks <- list(
   
 )
 
-# ==========================================
 # 5. MEMBUAT SKALA WARNA
-# ==========================================
-
 buat_skala <- function(r, warna) {
   
   nilai <- raster::getValues(r)
@@ -170,10 +160,7 @@ skala_indeks <- lapply(
 
 names(skala_indeks) <- names(daftar_raster)
 
-# ==========================================
 # 6. FUNGSI POPUP
-# ==========================================
-
 format_nilai <- function(x) {
   
   if (length(x) == 0 || is.na(x)) {
@@ -211,10 +198,7 @@ buat_popup <- function(data_kecamatan, indeks) {
   )
 }
 
-# ==========================================
 # 7. FUNGSI KARTU INFORMASI INDEKS
-# ==========================================
-
 kartu_indeks <- function(judul, objek, deskripsi,
                          warna, keterangan) {
   
@@ -260,10 +244,7 @@ kartu_indeks <- function(judul, objek, deskripsi,
   )
 }
 
-# ==========================================
 # 8. USER INTERFACE
-# ==========================================
-
 ui <- dashboardPage(
   
   # HEADER
@@ -596,25 +577,17 @@ ui <- dashboardPage(
   )      # Penutup dashboardBody
 )        # Penutup dashboardPage
 
-# ==========================================
-# 9. SERVER
-# ==========================================
 
+# 9. SERVER
 server <- function(input, output, session) {
   
-  # ========================================
   # INDEKS AKTIF
-  # ========================================
-  
   output$indeks_aktif <- renderText({
     input$pilih_indeks
   })
   
   
-  # ========================================
   # FUNGSI MENAMPILKAN RASTER
-  # ========================================
-  
   tampilkan_indeks <- function(peta, indeks) {
     
     info <- skala_indeks[[indeks]]
@@ -671,10 +644,7 @@ server <- function(input, output, session) {
   }
   
   
-  # ========================================
   # PETA AWAL
-  # ========================================
-  
   output$peta_magelang <- renderLeaflet({
     
     peta <- leaflet() %>%
@@ -718,10 +688,7 @@ server <- function(input, output, session) {
       )
   })
   
-  # ========================================
   # MENGGANTI INDEKS
-  # ========================================
-  
   observeEvent(input$pilih_indeks, {
     
     indeks <- input$pilih_indeks
@@ -742,10 +709,8 @@ server <- function(input, output, session) {
     
   }, ignoreInit = TRUE)
   
-  # ========================================
+
   # MENAMPILKAN BATAS KECAMATAN
-  # ========================================
-  
   observeEvent(input$batas_kecamatan, {
     
     proxy <- leafletProxy(
@@ -766,10 +731,8 @@ server <- function(input, output, session) {
     
   }, ignoreInit = TRUE)
   
-  # ========================================
+
   # POPUP KECAMATAN
-  # ========================================
-  
   observeEvent(
     input$peta_magelang_shape_click,
     {
@@ -806,10 +769,8 @@ server <- function(input, output, session) {
     }
   )
   
-  # ========================================
+
   # STATISTIK KECAMATAN
-  # ========================================
-  
   output$jumlah_kecamatan <- renderValueBox({
     
     valueBox(
@@ -865,8 +826,5 @@ server <- function(input, output, session) {
   spacing = "s")
 }
 
-# ==========================================
 # 10. MENJALANKAN APLIKASI
-# ==========================================
-
 shinyApp(ui, server)

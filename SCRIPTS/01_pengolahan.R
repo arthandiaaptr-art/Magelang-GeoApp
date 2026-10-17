@@ -1,8 +1,19 @@
+# ==========================================
+# KABUPATEN MAGELANG
+# Daffina Putri Affandi 5016241101
+# Arthandia Pratma T.R 5016241105
+# ==========================================
+
+# LANGKAH 1 - MEMANGGIL PACKAGE
+# ==============================
 library(terra)
 library(sf)
 library(dplyr)
 library(ggplot2)
 library(exactextractr)
+
+# LANGKAH 2 - MEMERIKSA DAN MEMBACA SHAPEFILE
+# ============================================
 
 # Memeriksa folder SHP
 list.files("DATA/SHP")
@@ -14,6 +25,9 @@ kabupaten <- st_read(
 kecamatan <- st_read(
   "DATA/SHP/Kecamatan.shp"
 )
+
+# LANGKAH 3 - MEMERIKSA DATA SENTINEL-2
+# ============================================
 
 # Melihat isi folder Sentinel
 list.files("DATA/SENTINEL")
@@ -50,6 +64,9 @@ for (b in band_dicari) {
   cat(b, ":", jumlah, "file\n")
 }
 
+# LANGKAH 4 - MEMBUAT FUNGSI PEMBACA BAND
+# =========================================
+
 # Fungsi membaca band Sentinel-2
 ambil_band <- function(kode, resolusi) {
   
@@ -74,6 +91,9 @@ ambil_band <- function(kode, resolusi) {
   return(rast(file))
 }
 
+# LANGKAH 5 - MEMBACA BAND SENTINEL-2
+# =====================================
+
 # Membaca band resolusi 10 meter
 B02 <- ambil_band("B02", 10)
 B03 <- ambil_band("B03", 10)
@@ -83,6 +103,9 @@ B08 <- ambil_band("B08", 10)
 # Membaca band resolusi 20 meter
 B05 <- ambil_band("B05", 20)
 B11 <- ambil_band("B11", 20)
+
+# LANGKAH 6 - MEMERIKSA PETA, CRS, RESOLUSI
+# ===========================================
 
 plot(B04)
 
@@ -107,10 +130,8 @@ terra::ext(B04)
 # Memeriksa resolusi
 terra::res(B04)
 
-
-# ==========================================
-# LANGKAH 15 - MEMPERBAIKI CRS SENTINEL-2
-# ==========================================
+# LANGKAH 7 - MEMPERBAIKI CRS SENTINEL-2
+# =========================================
 
 # Menetapkan CRS sesuai metadata Sentinel-2
 terra::crs(B02) <- "EPSG:32749"
@@ -155,8 +176,7 @@ kabupaten_utm$WADMKK
 # Memeriksa nama kecamatan
 kecamatan_utm$WADMKC
 
-# ==========================================
-# LANGKAH 15.6 - MEMILIH 21 KECAMATAN MAGELANG
+# LANGKAH 8 - MEMILIH 21 KECAMATAN MAGELANG
 # ==========================================
 
 # Daftar 21 kecamatan Kabupaten Magelang
@@ -195,8 +215,7 @@ nrow(kecamatan_magelang)
 # Menampilkan nama kecamatan
 kecamatan_magelang$WADMKC
 
-# ==========================================
-# LANGKAH 15.7 - PETA KECAMATAN MAGELANG
+# LANGKAH 9 - PETA KECAMATAN MAGELANG
 # ==========================================
 
 # Menampilkan batas Kabupaten Magelang
@@ -215,8 +234,7 @@ plot(
   lwd = 1
 )
 
-# ==========================================
-# LANGKAH 16.1 - CEK CAKUPAN CITRA
+# LANGKAH 10 - CEK CAKUPAN CITRA
 # ==========================================
 
 # Mengubah batas raster menjadi poligon
@@ -259,8 +277,7 @@ persentase_cakupan <- luas_tercakup / sum(luas_kabupaten) * 100
 # Menampilkan hasil
 round(persentase_cakupan, 2)
 
-# ==========================================
-# LANGKAH 16.3 - MEMERIKSA DUA TILE SENTINEL
+# LANGKAH 11 - MEMERIKSA DUA TILE SENTINEL
 # ==========================================
 
 # Mencari semua file band B04 resolusi 10 meter
@@ -277,8 +294,7 @@ length(file_B04)
 # Menampilkan lokasi file
 file_B04
 
-# ==========================================
-# LANGKAH 16.4 - MEMBACA DUA TILE SENTINEL-2
+# LANGKAH 12 - MEMBACA DUA TILE SENTINEL-2
 # ==========================================
 
 # Mencari file B04 dari kedua tile
@@ -307,8 +323,7 @@ terra::crs(B04_timur) <- "EPSG:32749"
 B04_barat
 B04_timur
 
-# ==========================================
-# LANGKAH 16.5 - MEMPERBAIKI CRS DUA CITRA
+# LANGKAH 13 - MEMPERBAIKI CRS DUA CITRA
 # ==========================================
 
 # Menetapkan CRS kedua citra
@@ -333,8 +348,7 @@ Sys.setenv(
   PROJ_DATA = lokasi_proj
 )
 
-# ==========================================
-# LANGKAH 16.6 - MOSAIC CITRA B04
+# LANGKAH 14 - MOSAIC CITRA B04
 # ==========================================
 
 # Membuat batas area Kabupaten Magelang
@@ -378,8 +392,7 @@ library(sf)
 kabupaten <- sf::st_read("DATA/SHP/Kabupaten.shp")
 kabupaten_utm <- kabupaten
 
-# ==========================================
-# LANGKAH 16.7 - MEMERIKSA HASIL MOSAIC
+# LANGKAH 15 - MEMERIKSA HASIL MOSAIC
 # ==========================================
 
 # Menampilkan informasi mosaic
@@ -399,8 +412,7 @@ plot(
   lwd = 2
 )
 
-# ==========================================
-# LANGKAH 16.8 - MASKING CITRA B04
+# LANGKAH 16 - MASKING CITRA B04
 # ==========================================
 
 # Memotong mosaic mengikuti bentuk kabupaten
@@ -437,9 +449,8 @@ terra::writeRaster(
 )
 
 
-# ==========================================
-# LANGKAH 17.1 - MEMBACA BAND B02
-# ==========================================
+# LANGKAH 17 - MEMBACA, MENGOLAH, & HASIL BAND B02
+# =================================================
 
 # Mencari file B02 resolusi 10 meter
 file_B02 <- list.files(
@@ -451,10 +462,6 @@ file_B02 <- list.files(
 
 # Memeriksa file yang ditemukan
 file_B02
-
-# ==========================================
-# LANGKAH 17.2 - MEMBACA BAND B02
-# ==========================================
 
 # Membaca citra B02 barat
 B02_barat <- terra::rast(
@@ -473,10 +480,6 @@ terra::crs(B02_timur) <- "EPSG:32749"
 # Memeriksa informasi kedua citra
 B02_barat
 B02_timur
-
-# ==========================================
-# LANGKAH 17.3 - PENGOLAHAN BAND B02
-# ==========================================
 
 # 1. Crop citra B02 barat
 B02_barat_crop <- terra::crop(
@@ -517,19 +520,14 @@ plot(
   lwd = 2
 )
 
-# ==========================================
-# MENYIMPAN HASIL BAND B02
-# ==========================================
-
 terra::writeRaster(
   B02_final,
   "HASIL/B02_Magelang.tif",
   overwrite = TRUE
 )
 
-# ==========================================
-# LANGKAH 17.4 - MEMBACA BAND B03
-# ==========================================
+# LANGKAH 18 - MEMBACA, MENGOLAH, & HASIL BAND B03
+# =================================================
 
 # Mencari file B03 resolusi 10 meter
 file_B03 <- list.files(
@@ -541,10 +539,6 @@ file_B03 <- list.files(
 
 # Memeriksa file yang ditemukan
 file_B03
-
-# ==========================================
-# MEMBACA CITRA B03 BARAT DAN TIMUR
-# ==========================================
 
 # Membaca citra B03 barat
 B03_barat <- terra::rast(
@@ -564,9 +558,6 @@ terra::crs(B03_timur) <- "EPSG:32749"
 B03_barat
 B03_timur
 
-# ==========================================
-# LANGKAH 17.5 - CROP DAN MOSAIC B03
-# ==========================================
 
 # Crop B03 barat
 B03_barat_crop <- terra::crop(
@@ -580,6 +571,7 @@ B03_timur_crop <- terra::crop(
   batas_kab
 )
 
+
 # Mosaic kedua citra
 B03_mosaic <- terra::mosaic(
   B03_barat_crop,
@@ -587,9 +579,6 @@ B03_mosaic <- terra::mosaic(
   fun = "mean"
 )
 
-# ==========================================
-# LANGKAH 17.6 - MASKING B03
-# ==========================================
 
 # Masking mengikuti batas kabupaten
 B03_final <- terra::mask(
@@ -611,9 +600,6 @@ plot(
   lwd = 2
 )
 
-# ==========================================
-# MENYIMPAN HASIL BAND B03
-# ==========================================
 
 terra::writeRaster(
   B03_final,
@@ -624,9 +610,9 @@ terra::writeRaster(
 # Memeriksa apakah file berhasil disimpan
 file.exists("HASIL/B03_Magelang.tif")
 
-# ==========================================
-# LANGKAH 18.1 - MENCARI FILE B05
-# ==========================================
+
+# LANGKAH 19 - MEMBACA, MENGOLAH, DAN HASIL BAND B05
+# ===================================================
 
 # Mencari band B05 resolusi 20 meter
 file_B05 <- list.files(
@@ -639,9 +625,6 @@ file_B05 <- list.files(
 # Memeriksa file yang ditemukan
 file_B05
 
-# ==========================================
-# LANGKAH 18.2 - MEMBACA BAND B05
-# ==========================================
 
 # Membaca citra B05 barat
 B05_barat <- terra::rast(
@@ -661,9 +644,6 @@ terra::crs(B05_timur) <- "EPSG:32749"
 B05_barat
 B05_timur
 
-# ==========================================
-# LANGKAH 18.3 - CROP DAN MOSAIC B05
-# ==========================================
 
 # Crop citra B05 barat
 B05_barat_crop <- terra::crop(
@@ -684,9 +664,6 @@ B05_mosaic <- terra::mosaic(
   fun = "mean"
 )
 
-# ==========================================
-# LANGKAH 18.4 - MASKING B05
-# ==========================================
 
 # Masking mengikuti batas Kabupaten Magelang
 B05_mask <- terra::mask(
@@ -708,9 +685,6 @@ plot(
   lwd = 2
 )
 
-# ==========================================
-# LANGKAH 18.5 - RESAMPLING B05 KE 10 METER
-# ==========================================
 
 # Menyesuaikan B05 dengan resolusi dan grid B04
 B05_final <- terra::resample(
@@ -725,9 +699,9 @@ B05_final
 # Memeriksa resolusi
 terra::res(B05_final)
 
-# ==========================================
-# LANGKAH 19.1 - MENCARI FILE B08
-# ==========================================
+
+# LANGKAH 20 - MEMBACA, MENGOLAH, & HASIL BAND B08
+# =================================================
 
 file_B08 <- list.files(
   "DATA/SENTINEL",
@@ -739,9 +713,6 @@ file_B08 <- list.files(
 # Memeriksa file yang ditemukan
 file_B08
 
-# ==========================================
-# LANGKAH 19.2 - MEMBACA BAND B08
-# ==========================================
 
 # Membaca B08 barat
 B08_barat <- terra::rast(
@@ -761,9 +732,6 @@ terra::crs(B08_timur) <- "EPSG:32749"
 B08_barat
 B08_timur
 
-# ==========================================
-# LANGKAH 19.3 - CROP DAN MOSAIC B08
-# ==========================================
 
 # Crop citra B08 barat
 B08_barat_crop <- terra::crop(
@@ -784,9 +752,6 @@ B08_mosaic <- terra::mosaic(
   fun = "mean"
 )
 
-# ==========================================
-# LANGKAH 19.4 - MASKING B08
-# ==========================================
 
 # Masking mengikuti batas kabupaten
 B08_final <- terra::mask(
@@ -808,9 +773,6 @@ plot(
   lwd = 2
 )
 
-# ==========================================
-# LANGKAH 19.5 - MENYIMPAN HASIL B08
-# ==========================================
 
 terra::writeRaster(
   B08_final,
@@ -831,9 +793,9 @@ terra::compareGeom(
   stopOnError = FALSE
 )
 
-# ==========================================
-# LANGKAH 20.1 - MENCARI FILE B11
-# ==========================================
+
+# LANGKAH 21 - MEMBACA, MENGOLAH, & HASIL BAND B11
+# ===================================================
 
 # Mencari band B11 resolusi 20 meter
 file_B11 <- list.files(
@@ -846,9 +808,6 @@ file_B11 <- list.files(
 # Memeriksa file yang ditemukan
 file_B11
 
-# ==========================================
-# LANGKAH 20.2 - MEMBACA BAND B11
-# ==========================================
 
 # Membaca B11 barat
 B11_barat <- terra::rast(
@@ -868,9 +827,6 @@ terra::crs(B11_timur) <- "EPSG:32749"
 B11_barat
 B11_timur
 
-# ==========================================
-# LANGKAH 20.3 - CROP DAN MOSAIC B11
-# ==========================================
 
 # Crop citra B11 barat
 B11_barat_crop <- terra::crop(
@@ -891,9 +847,6 @@ B11_mosaic <- terra::mosaic(
   fun = "mean"
 )
 
-# ==========================================
-# LANGKAH 20.4 - MASKING B11
-# ==========================================
 
 # Masking sesuai batas kabupaten
 B11_mask <- terra::mask(
@@ -915,9 +868,6 @@ plot(
   lwd = 2
 )
 
-# ==========================================
-# LANGKAH 20.5 - RESAMPLING B11
-# ==========================================
 
 # Menyesuaikan B11 dengan grid B04
 B11_final <- terra::resample(
@@ -932,9 +882,6 @@ B11_final
 # Memeriksa resolusi
 terra::res(B11_final)
 
-# ==========================================
-# LANGKAH 20.6 - MENYIMPAN HASIL B11
-# ==========================================
 
 # Menampilkan hasil B11
 plot(
@@ -967,31 +914,7 @@ terra::compareGeom(
   stopOnError = FALSE
 )
 
-# ==========================================
-# LANJUTAN PENGOLAHAN DI LAPTOP TEMAN
-# ==========================================
 
-library(terra)
-
-# Membaca hasil pengolahan sebelumnya
-B02_final <- rast("HASIL/B02_Magelang.tif")
-B03_final <- rast("HASIL/B03_Magelang.tif")
-B04_final <- rast("HASIL/B04_Magelang.tif")
-B05_final <- rast("HASIL/B05_Magelang.tif")
-B08_final <- rast("HASIL/B08_Magelang.tif")
-B11_final <- rast("HASIL/B11_Magelang.tif")
-
-# Memeriksa kesesuaian seluruh band
-compareGeom(
-  B02_final,
-  B03_final,
-  B04_final,
-  B05_final,
-  B08_final,
-  B11_final
-)
-
-# ==========================================
 # LANGKAH 21 - MENGHITUNG NDVI
 # ==========================================
 
@@ -1019,7 +942,7 @@ terra::writeRaster(
 # Memeriksa hasil penyimpanan
 file.exists("HASIL/NDVI_Magelang.tif")
 
-# ==========================================
+
 # LANGKAH 22 - MENGHITUNG NDBI
 # ==========================================
 
@@ -1028,16 +951,12 @@ B08_final <- terra::rast("HASIL/B08_Magelang.tif")
 
 B11_final <- terra::rast("HASIL/B11_Magelang.tif")
 
-# LANGKAH 22.3 - Memeriksa kesesuaian band
+# Memeriksa kesesuaian band
 
 terra::compareGeom(
   B08_final,
   B11_final
 )
-
-# ==========================================
-# LANGKAH 22.4 - MENGHITUNG NDBI
-# ==========================================
 
 # Menghitung indeks kawasan terbangun
 NDBI <- terra::ifel(
@@ -1047,19 +966,13 @@ NDBI <- terra::ifel(
     (B11_final + B08_final)
 )
 
-# ==========================================
-# LANGKAH 22.5 - MENAMPILKAN PETA NDBI
-# ==========================================
-
+# Menampilkan peta NDBI
 plot(
   NDBI,
   main = "NDBI Kabupaten Magelang"
 )
 
-# ==========================================
-# LANGKAH 22.6 - MENYIMPAN NDBI
-# ==========================================
-
+# Menyimpan NDBI
 terra::writeRaster(
   NDBI,
   "HASIL/NDBI_Magelang.tif",
@@ -1069,8 +982,8 @@ terra::writeRaster(
 # Memeriksa apakah file berhasil disimpan
 file.exists("HASIL/NDBI_Magelang.tif")
 
-# ==========================================
-# LANGKAH 23 - MENGHITUNG NDWI
+
+# LANGKAH 24 - MENGHITUNG NDWI
 # ==========================================
 
 # Membaca band Green dan NIR
@@ -1084,10 +997,7 @@ terra::compareGeom(
   B08_final
 )
 
-# ==========================================
-# PERHITUNGAN NDWI
-# ==========================================
-
+# Perhitungan NDWI
 NDWI <- terra::ifel(
   (B03_final + B08_final) == 0,
   NA,
@@ -1095,20 +1005,14 @@ NDWI <- terra::ifel(
     (B03_final + B08_final)
 )
 
-# ==========================================
-# MENAMPILKAN PETA NDWI
-# ==========================================
-
+# Menampilkan peta NDWI
 plot(
   NDWI,
   main = "NDWI Kabupaten Magelang",
   col = hcl.colors(100, "Blues")
 )
 
-# ==========================================
-# MENYIMPAN HASIL NDWI
-# ==========================================
-
+# Menyimpan NDWI
 terra::writeRaster(
   NDWI,
   "HASIL/NDWI_Magelang.tif",
@@ -1118,9 +1022,9 @@ terra::writeRaster(
 # Memeriksa file hasil NDWI
 file.exists("HASIL/NDWI_Magelang.tif")
 
-# ==========================================
-# LANGKAH 24 - MENGHITUNG NDCI
-# ==========================================
+
+# LANGKAH 25 - MENGHITUNG NDCI
+# ===============================
 
 # Membaca band Red Edge dan Red
 B05_final <- terra::rast("HASIL/B05_Magelang.tif")
@@ -1133,10 +1037,7 @@ terra::compareGeom(
   B04_final
 )
 
-# ==========================================
-# PERHITUNGAN NDCI
-# ==========================================
-
+# Perhitungan NDCI
 NDCI <- terra::ifel(
   (B05_final + B04_final) == 0,
   NA,
@@ -1144,20 +1045,14 @@ NDCI <- terra::ifel(
     (B05_final + B04_final)
 )
 
-# ==========================================
-# MENAMPILKAN PETA NDCI
-# ==========================================
-
+# Menampilkan peta NDCI
 plot(
   NDCI,
   main = "NDCI Kabupaten Magelang",
   col = hcl.colors(100, "YlGn")
 )
 
-# ==========================================
-# MENYIMPAN HASIL NDCI
-# ==========================================
-
+# Menyimpan NDCI
 terra::writeRaster(
   NDCI,
   "HASIL/NDCI_Magelang.tif",
@@ -1167,8 +1062,8 @@ terra::writeRaster(
 # Memeriksa hasil penyimpanan NDCI
 file.exists("HASIL/NDCI_Magelang.tif")
 
-# ==========================================
-# LANGKAH 25 - PERSIAPAN KLASIFIKASI CITRA
+
+# LANGKAH 26 - PERSIAPAN KLASIFIKASI CITRA
 # ==========================================
 
 # Membaca hasil keempat indeks
@@ -1238,8 +1133,8 @@ terra::writeRaster(
 # Memeriksa apakah file tersimpan
 file.exists("HASIL/Indeks_Gabungan_Magelang.tif")
 
-# ==========================================
-# LANGKAH 26 - PERSIAPAN KLASIFIKASI
+
+# LANGKAH 27 - PERSIAPAN KLASIFIKASI
 # ==========================================
 
 # Mencari file SCL pada folder Sentinel-2
@@ -1263,8 +1158,8 @@ basename(file_SCL)
 # Menampilkan folder asal masing-masing file
 dirname(file_SCL)
 
-# ==========================================
-# LANGKAH 26.5 - MEMILIH FILE SCL 20 METER
+
+# LANGKAH 28 - MEMILIH FILE SCL 20 METER
 # ==========================================
 
 # Memilih SCL resolusi 20 meter
@@ -1278,8 +1173,8 @@ basename(SCL_20m)
 # Memastikan jumlah file
 length(SCL_20m)
 
-# ==========================================
-# LANGKAH 26.6 - MEMBACA RASTER SCL
+
+# LANGKAH 29 - MEMBACA RASTER SCL
 # ==========================================
 
 # Membaca SCL tile pertama
@@ -1296,8 +1191,8 @@ SCL_timur <- terra::rast(
 SCL_barat
 SCL_timur
 
-# ==========================================
-# LANGKAH 26.7 - MEMERIKSA CRS SCL
+
+# LANGKAH 30 - MEMERIKSA CRS SCL
 # ==========================================
 
 terra::crs(SCL_barat, describe = TRUE)
@@ -1309,8 +1204,8 @@ terra::same.crs(
   SCL_timur
 )
 
-# ==========================================
-# LANGKAH 26.8 - MENAMPILKAN SCL
+
+# LANGKAH 31 - MENAMPILKAN SCL
 # ==========================================
 
 # Menampilkan SCL tile barat
@@ -1325,15 +1220,14 @@ plot(
   main = "SCL Sentinel-2 Tile Timur"
 )
 
-# ==========================================
-# LANGKAH 26.9 - MEMERIKSA CRS SCL
+
+# LANGKAH 32 - MEMERIKSA CRS SCL
 # ==========================================
 
 terra::same.crs(SCL_barat, SCL_timur)
 
-# ==========================================
-# MENGGABUNGKAN DUA TILE SCL
-# ==========================================
+
+# Menggabungkan dua tile SCL
 
 SCL_gabungan <- terra::mosaic(
   SCL_barat,
@@ -1350,8 +1244,8 @@ plot(
   main = "SCL Gabungan Sentinel-2 Magelang"
 )
 
-# ==========================================
-# LANGKAH 26.10 - MENYAMAKAN GRID SCL
+
+# LANGKAH 33 - MENYAMAKAN GRID SCL
 # ==========================================
 
 # Membaca raster acuan
@@ -1372,8 +1266,8 @@ terra::compareGeom(
   NDVI_acuan
 )
 
-# ==========================================
-# LANGKAH 26.11 - MASKING SCL MAGELANG
+
+# LANGKAH 34 - MASKING SCL MAGELANG
 # ==========================================
 
 # Mengikuti area valid raster NDVI
@@ -1389,8 +1283,8 @@ plot(
   main = "SCL Kabupaten Magelang"
 )
 
-# ==========================================
-# LANGKAH 26.12 - MENYIMPAN HASIL SCL
+
+# LANGKAH 35 - MENYIMPAN HASIL SCL
 # ==========================================
 
 terra::writeRaster(
@@ -1427,8 +1321,8 @@ writeRaster(
   overwrite = TRUE
 )
 
-# ==========================================
-# LANGKAH 27 - KLASIFIKASI TUTUPAN LAHAN
+
+# LANGKAH 36 - KLASIFIKASI TUTUPAN LAHAN
 # ==========================================
 
 # Membaca raster SCL
@@ -1440,9 +1334,7 @@ NDBI <- terra::rast("HASIL/NDBI_Magelang.tif")
 # Memeriksa kesesuaian raster
 terra::compareGeom(SCL, NDBI)
 
-# ==========================================
-# MEMBUAT KLASIFIKASI AWAL
-# ==========================================
+# Membuat Klasifikasi Awal
 
 # 1 = Vegetasi
 # 2 = Permukaan tidak bervegetasi
@@ -1465,9 +1357,7 @@ klasifikasi_awal <- terra::ifel(
 
 names(klasifikasi_awal) <- "Klasifikasi_Awal"
 
-# ==========================================
-# MENAMPILKAN PETA KLASIFIKASI AWAL
-# ==========================================
+# Menampilkan peta klasifikasi awal
 
 warna_kelas <- c(
   "forestgreen",
@@ -1495,9 +1385,7 @@ plot(
 # Menghitung jumlah piksel per kelas
 terra::freq(klasifikasi_awal)
 
-# ==========================================
-# MENYIMPAN KLASIFIKASI AWAL
-# ==========================================
+# Menyimpan klasifikasi awal
 
 terra::writeRaster(
   klasifikasi_awal,
@@ -1509,8 +1397,8 @@ terra::writeRaster(
 # Memeriksa file
 file.exists("HASIL/Klasifikasi_Awal_Magelang.tif")
 
-# ==========================================
-# LANGKAH 28 - EVALUASI KAWASAN TERBANGUN
+
+# LANGKAH 36 - EVALUASI KAWASAN TERBANGUN
 # ==========================================
 
 # Membaca klasifikasi awal
@@ -1529,7 +1417,7 @@ terra::compareGeom(
   NDVI
 )
 
-# ==========================================
+
 # MEMERIKSA NDBI PADA KELAS NONVEGETASI
 # ==========================================
 
@@ -1547,7 +1435,7 @@ terra::global(
   na.rm = TRUE
 )
 
-# ==========================================
+
 # MEMBUAT CALON KAWASAN TERBANGUN
 # ==========================================
 
@@ -1569,10 +1457,7 @@ plot(
 # Menghitung jumlah piksel calon kawasan terbangun
 terra::freq(calon_terbangun)
 
-# ==========================================
-# MENYIMPAN CALON KAWASAN TERBANGUN
-# ==========================================
-
+# Menyimpan hasil
 terra::writeRaster(
   calon_terbangun,
   "HASIL/Calon_Terbangun_Magelang.tif",
@@ -1583,8 +1468,8 @@ terra::writeRaster(
 # Memeriksa file hasil
 file.exists("HASIL/Calon_Terbangun_Magelang.tif")
 
-# ==========================================
-# LANGKAH 29 - PETA KLASIFIKASI GABUNGAN
+
+# LANGKAH 37 - PETA KLASIFIKASI GABUNGAN
 # ==========================================
 
 # Membaca raster SCL
@@ -1598,10 +1483,7 @@ calon_terbangun <- terra::rast(
 # Memeriksa kesesuaian raster
 terra::compareGeom(SCL, calon_terbangun)
 
-# ==========================================
-# MEMBUAT KLASIFIKASI GABUNGAN
-# ==========================================
-
+# Membuat klasifikasi gabungan
 klasifikasi_gabungan <- terra::ifel(
   SCL == 4, 1,
   terra::ifel(
@@ -1618,10 +1500,7 @@ klasifikasi_gabungan <- terra::ifel(
 
 names(klasifikasi_gabungan) <- "Kelas_Tutupan_Lahan"
 
-# ==========================================
-# MENAMPILKAN PETA KLASIFIKASI
-# ==========================================
-
+# Menampilkan peta klasifikasi gabungan
 warna_klasifikasi <- c(
   "forestgreen",
   "orange",
@@ -1639,10 +1518,7 @@ plot(
 # Menghitung jumlah piksel tiap kelas
 terra::freq(klasifikasi_gabungan)
 
-# ==========================================
-# MENYIMPAN KLASIFIKASI GABUNGAN
-# ==========================================
-
+# Menyimpan klasifikasi gabungan
 terra::writeRaster(
   klasifikasi_gabungan,
   "HASIL/Klasifikasi_Gabungan_Magelang.tif",
@@ -1653,8 +1529,8 @@ terra::writeRaster(
 # Memeriksa apakah file tersimpan
 file.exists("HASIL/Klasifikasi_Gabungan_Magelang.tif")
 
-# ==========================================
-# LANGKAH 30 - EVALUASI KLASIFIKASI
+
+# LANGKAH 38 - EVALUASI KLASIFIKASI
 # ==========================================
 
 library(terra)
@@ -1672,10 +1548,7 @@ SCL <- terra::rast(
 # Memeriksa kesesuaian raster
 terra::compareGeom(klasifikasi, SCL)
 
-# ==========================================
-# MENGHITUNG JUMLAH PIKSEL SETIAP KELAS
-# ==========================================
-
+# Menghitung jumlah piksel tiap kelas
 frekuensi_kelas <- terra::freq(
   klasifikasi
 )
@@ -1683,9 +1556,8 @@ frekuensi_kelas <- terra::freq(
 # Menampilkan hasil
 frekuensi_kelas
 
-# ==========================================
-# MEMERIKSA AREA BELUM TERKLASIFIKASI
-# ==========================================
+# Memeriksa area belum terklasifikasi
+# ====================================
 
 # Piksel valid SCL yang belum memiliki kelas
 belum_terklasifikasi <- terra::ifel(
@@ -1719,8 +1591,8 @@ persen_belum <- (
 # Menampilkan hasil
 persen_belum
 
-# ==========================================
-# MENAMPILKAN AREA BELUM TERKLASIFIKASI
+
+# Menampilkan area belum terklasifikasi
 # ==========================================
 
 plot(
@@ -1730,8 +1602,8 @@ plot(
   legend = FALSE
 )
 
-# ==========================================
-# PETA KLASIFIKASI DENGAN LEGENDA
+
+# Peta klasifikasi
 # ==========================================
 
 # Warna setiap kelas
@@ -1765,9 +1637,9 @@ legend(
   bg = "white"
 )
 
-# ==========================================
-# MENYIMPAN PETA KLASIFIKASI
-# ==========================================
+
+# Menyimpan peta klasifikasi
+# =============================
 
 png(
   "HASIL/Peta_Klasifikasi_Magelang.png",
@@ -1802,8 +1674,8 @@ dev.off()
 # Memeriksa hasil penyimpanan
 file.exists("HASIL/Peta_Klasifikasi_Magelang.png")
 
-# ==========================================
-# LANGKAH 31 - ANALISIS PER KECAMATAN
+
+# LANGKAH 39 - ANALISIS PER KECAMATAN
 # ==========================================
 
 library(sf)
@@ -1823,8 +1695,8 @@ nrow(kecamatan_awal)
 # Melihat beberapa baris data
 head(kecamatan_awal)
 
-# ==========================================
-# LANGKAH 32 - MEMILIH KECAMATAN MAGELANG
+
+# LANGKAH 40 - MEMILIH KECAMATAN MAGELANG
 # ==========================================
 
 # Daftar 21 kecamatan Kabupaten Magelang
@@ -1888,8 +1760,8 @@ sf::st_write(
 # Memeriksa file
 file.exists("HASIL/Kecamatan_Magelang.shp")
 
-# ==========================================
-# LANGKAH 33 - STATISTIK PER KECAMATAN
+
+# LANGKAH 41 - STATISTIK PER KECAMATAN
 # ==========================================
 
 library(terra)
@@ -1956,9 +1828,8 @@ kecamatan_vect <- terra::project(
   terra::crs(indeks_zonal)
 )
 
-# ==========================================
-# LANGKAH 33.6 - STATISTIK ZONAL
-# METODE LEBIH RINGAN
+
+# LANGKAH 42 - STATISTIK ZONAL
 # ==========================================
 
 statistik_rata <- terra::extract(
@@ -1971,10 +1842,6 @@ statistik_rata <- terra::extract(
 
 # Menampilkan hasil
 head(statistik_rata)
-
-# ==========================================
-# LANGKAH 33.7 - MENAMBAHKAN NAMA KECAMATAN
-# ==========================================
 
 # Mengambil nama kecamatan sesuai urutan SHP
 nama_kecamatan <- kecamatan_magelang$WADMKC
@@ -1991,10 +1858,6 @@ print(hasil_zonal)
 # Memeriksa jumlah kecamatan
 nrow(hasil_zonal)
 
-# ==========================================
-# LANGKAH 33.8 - MENYIMPAN HASIL STATISTIK
-# ==========================================
-
 # Menyimpan tabel statistik ke CSV
 write.csv(
   hasil_zonal,
@@ -2005,8 +1868,8 @@ write.csv(
 # Memastikan file berhasil disimpan
 file.exists("HASIL/Statistik_Zonal_Magelang.csv")
 
-# ==========================================
-# LANGKAH 33.9 - GABUNGKAN STATISTIK DAN SHP
+
+# LANGKAH 43 - GABUNGKAN STATISTIK DAN SHP
 # ==========================================
 
 # Memastikan jumlah baris sama
@@ -2045,9 +1908,6 @@ colSums(
   )
 )
 
-# ==========================================
-# LANGKAH 33.10 - MENYIMPAN SHP STATISTIK ZONAL
-# ==========================================
 
 # Menyimpan SHP kecamatan beserta hasil statistik
 sf::st_write(
