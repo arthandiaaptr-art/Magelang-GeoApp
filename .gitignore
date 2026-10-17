@@ -1,0 +1,7 @@
+.RData
+.Rhistory
+.Rproj.user/
+DATA/
+HASIL/*.tif
+*.SAFE/
+*.SAFE.zip
