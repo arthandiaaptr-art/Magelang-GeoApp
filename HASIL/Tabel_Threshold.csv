@@ -1,0 +1,4 @@
+"Kelas","Indeks","Threshold","Aturan"
+"Vegetasi","NDVI",0.3325,"NDVI > 0.3325"
+"Area Terbangun","NDBI",-0.0525,"NDBI > -0.0525"
+"Perairan","NDWI",-0.3375,"NDWI > -0.3375"

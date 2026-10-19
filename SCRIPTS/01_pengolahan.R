@@ -355,23 +355,13 @@ Sys.setenv(
 batas_kab <- terra::vect(kabupaten_utm)
 
 # Memotong citra barat berdasarkan area kabupaten
-B04_barat_crop <- terra::crop(
-  B04_barat,
-  batas_kab
-)
+B04_barat_crop <- terra::crop(B04_barat,batas_kab)
 
 # Memotong citra timur berdasarkan area kabupaten
-B04_timur_crop <- terra::crop(
-  B04_timur,
-  batas_kab
-)
+B04_timur_crop <- terra::crop(B04_timur,batas_kab)
 
 # Menggabungkan kedua citra
-B04_mosaic <- terra::mosaic(
-  B04_barat_crop,
-  B04_timur_crop,
-  fun = "mean"
-)
+B04_mosaic <- terra::mosaic(B04_barat_crop,B04_timur_crop,fun = "mean")
 
 # Menampilkan hasil mosaic
 plot(
@@ -416,16 +406,10 @@ plot(
 # ==========================================
 
 # Memotong mosaic mengikuti bentuk kabupaten
-B04_final <- terra::mask(
-  B04_mosaic,
-  batas_kab
-)
+B04_final <- terra::mask(B04_mosaic,batas_kab)
 
 # Menampilkan hasil masking
-plot(
-  B04_final,
-  main = "Sentinel-2 B04 Kabupaten Magelang"
-)
+plot(B04_final,main = "Sentinel-2 B04 Kabupaten Magelang")
 
 # Menambahkan garis batas kabupaten
 plot(
@@ -1436,37 +1420,37 @@ terra::global(
 )
 
 
-# MEMBUAT CALON KAWASAN TERBANGUN
+# MEMBUAT AREA TERBANGUN
 # ==========================================
 
-calon_terbangun <- terra::ifel(
+NDWI <- terra::rast("HASIL/NDWI_Magelang.tif")
+
+area_terbangun <- terra::ifel(
   (klasifikasi_awal == 2) &
-    (NDBI > 0) &
-    (NDBI > NDVI),
+    (NDVI < 0.25) &
+    (NDBI > -0.10) &
+    (NDWI < 0),
   1,
   NA
 )
 
-# Menampilkan hasil
 plot(
-  calon_terbangun,
+  area_terbangun,
   col = "orange",
-  main = "Calon Kawasan Terbangun Magelang"
+  main = "Area Terbangun Magelang"
 )
 
-# Menghitung jumlah piksel calon kawasan terbangun
-terra::freq(calon_terbangun)
+terra::freq(area_terbangun)
 
-# Menyimpan hasil
 terra::writeRaster(
-  calon_terbangun,
-  "HASIL/Calon_Terbangun_Magelang.tif",
+  area_terbangun,
+  "HASIL/Area_Terbangun_Magelang.tif",
   datatype = "INT1U",
   overwrite = TRUE
 )
 
 # Memeriksa file hasil
-file.exists("HASIL/Calon_Terbangun_Magelang.tif")
+file.exists("HASIL/Area_Terbangun_Magelang.tif")
 
 
 # LANGKAH 37 - PETA KLASIFIKASI GABUNGAN
@@ -1475,9 +1459,9 @@ file.exists("HASIL/Calon_Terbangun_Magelang.tif")
 # Membaca raster SCL
 SCL <- terra::rast("HASIL/SCL_Magelang.tif")
 
-# Membaca calon kawasan terbangun
+# Membaca area kawasan terbangun
 calon_terbangun <- terra::rast(
-  "HASIL/Calon_Terbangun_Magelang.tif"
+  "HASIL/Area_Terbangun_Magelang.tif"
 )
 
 # Memeriksa kesesuaian raster
@@ -1556,52 +1540,6 @@ frekuensi_kelas <- terra::freq(
 # Menampilkan hasil
 frekuensi_kelas
 
-# Memeriksa area belum terklasifikasi
-# ====================================
-
-# Piksel valid SCL yang belum memiliki kelas
-belum_terklasifikasi <- terra::ifel(
-  !is.na(SCL) & is.na(klasifikasi),
-  1,
-  NA
-)
-
-# Menghitung jumlah piksel
-terra::freq(belum_terklasifikasi)
-
-# Menghitung total piksel valid SCL
-total_piksel <- terra::global(
-  !is.na(SCL),
-  "sum",
-  na.rm = TRUE
-)[1, 1]
-
-# Menghitung piksel belum terklasifikasi
-jumlah_belum <- terra::global(
-  !is.na(SCL) & is.na(klasifikasi),
-  "sum",
-  na.rm = TRUE
-)[1, 1]
-
-# Menghitung persentase
-persen_belum <- (
-  jumlah_belum / total_piksel
-) * 100
-
-# Menampilkan hasil
-persen_belum
-
-
-# Menampilkan area belum terklasifikasi
-# ==========================================
-
-plot(
-  belum_terklasifikasi,
-  col = "red",
-  main = "Area Belum Terklasifikasi Magelang",
-  legend = FALSE
-)
-
 
 # Peta klasifikasi
 # ==========================================
@@ -1628,7 +1566,7 @@ legend(
   "topright",
   legend = c(
     "Vegetasi",
-    "Calon kawasan terbangun",
+    "Area terbangun",
     "Badan air",
     "Awan"
   ),

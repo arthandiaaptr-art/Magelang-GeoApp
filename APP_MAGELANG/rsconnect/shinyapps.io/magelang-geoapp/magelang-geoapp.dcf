@@ -1,0 +1,10 @@
+name: magelang-geoapp
+title:
+username: magelang-geoapp
+account: magelang-geoapp
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 18204113
+bundleId: 12702711
+url: https://magelang-geoapp.shinyapps.io/magelang-geoapp/
+version: 1
